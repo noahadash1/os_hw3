@@ -15,11 +15,6 @@
 
 #endif
 
-typedef struct channelList
-{
-    channel *first;
-} channelList;
-
 typedef struct channel
 {
     char messageString[128];
@@ -28,5 +23,12 @@ typedef struct channel
     int mesLen;
 
 } channel;
+
+typedef struct channelList
+{
+    channel *first;
+} channelList;
+
+
 
 
