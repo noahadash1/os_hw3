@@ -174,7 +174,7 @@ static void __exit simple_cleanup(void)
   channel *tmp;
   int i;
   for(i=0; i<=256; i++){
-    pointer = massageSlotsDeviceFilesList[i].first
+    pointer = massageSlotsDeviceFilesList[i].first;
     while(pointer != NULL){
       tmp = pointer;
       pointer = pointer->next;
