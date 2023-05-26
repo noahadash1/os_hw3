@@ -15,7 +15,10 @@
 
 #endif
 
-
+typedef struct channelList
+{
+    channel *first;
+} channelList;
 
 typedef struct channel
 {
@@ -26,7 +29,4 @@ typedef struct channel
 
 } channel;
 
-typedef struct channelList
-{
-    channel *first;
-} channelList;
+
