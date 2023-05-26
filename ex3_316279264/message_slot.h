@@ -19,7 +19,7 @@ typedef struct channel
 {
     char messageString[128];
     unsigned int minorNumber;
-    channel *next;
+    struct channel *next;
     int mesLen;
 
 } channel;
