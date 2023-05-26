@@ -41,12 +41,12 @@ static long device_ioctl( struct file* file, unsigned int ioctl_command_id, unsi
     int curChannelMinorNum = iminor(file->f_inode);
     channel *channelPointer = massageSlotsDeviceFilesList[curChannelMinorNum].first;
     int i = 0;
-    while (int i == 0){
+    while (i == 0){
         if (channelPointer == NULL){
             i = 1;
         }
         else {
-            if(channelPointer.minorNumber == curChannelMinorNum){
+            if(channelPointer->minorNumber == curChannelMinorNum){
                 i = 2;
             }
             else {
@@ -172,7 +172,7 @@ static int __init simple_init(void)
 //---------------------------------------------------------------
 static void __exit simple_cleanup(void)
 {
-  channel *Pointer;
+  channel *pointer;
   channel *tmp;
   int i;
   for(i=0; i<=256; i++){
