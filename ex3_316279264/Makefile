@@ -2,8 +2,8 @@ obj-m := message_slot.o
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
-all:	
+all:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
-
-clean:	
+ 
+clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
