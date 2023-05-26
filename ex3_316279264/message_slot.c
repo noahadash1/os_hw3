@@ -29,48 +29,47 @@ static int device_open( struct inode* inode,
 
 //----------------------------------------------------------------
 static long device_ioctl( struct file* file, unsigned int ioctl_command_id, unsigned long ioctl_param ){
-    //If the passed command is not MSG_SLOT_CHANNEL, the ioctl() returns -1 and errno is set to EINVAL.
-    if(ioctl_command_id != MSG_SLOT_CHANNEL){
-        return -EINVAL;
+  int curChannelMinorNum;
+  channel *tmp;
+  //If the passed command is not MSG_SLOT_CHANNEL, the ioctl() returns -1 and errno is set to EINVAL.
+  if(ioctl_command_id != MSG_SLOT_CHANNEL){
+      return -EINVAL;
+      }
+  //If the passed channel id is 0, the ioctl() returns -1 and errno is set to EINVAL.
+  if(ioctl_param == 0){
+    return -EINVAL;
+  }
+  curChannelMinorNum = iminor(file->f_inode);
+  channel *channelPointer = massageSlotsDeviceFilesList[curChannelMinorNum].first;
+  int i = 0;
+  while (i == 0){
+    if (channelPointer == NULL){
+      i = 1;
     }
-    //If the passed channel id is 0, the ioctl() returns -1 and errno is set to EINVAL.
-    if(ioctl_param == 0){
+    else {
+      if(channelPointer->minorNumber == curChannelMinorNum){
+        i = 2;
+      }
+      else {
+        channelPointer = channelPointer->next;
+      }
+    }
+  }
+  // there is no channel with the specified minorNumber
+  if(i == 1){
+    channelPointer = (channel *)kmalloc(sizeof(channel), GFP_KERNEL);
+    // failing to allocate memory
+    if (channelPointer == NULL) {
       return -EINVAL;
     }
-
-    int curChannelMinorNum;
-    curChannelMinorNum = iminor(file->f_inode);
-    channel *channelPointer = massageSlotsDeviceFilesList[curChannelMinorNum].first;
-    int i = 0;
-    while (i == 0){
-        if (channelPointer == NULL){
-            i = 1;
-        }
-        else {
-            if(channelPointer->minorNumber == curChannelMinorNum){
-                i = 2;
-            }
-            else {
-                channelPointer = channelPointer->next;
-            }
-        }
-    }
-    // there is no channel with the specified minorNumber
-    if(i == 1){
-      channelPointer = (channel *)kmalloc(sizeof(channel), GFP_KERNEL);
-      // failing to allocate memory
-      if (channelPointer == NULL) {
-        return -EINVAL;
-      }
-      channelPointer->minorNumber = ioctl_param;
-      channelPointer->mesLen = 0;
-      channelPointer->next = NULL;
-    }
-    channel *tmp;
-    tmp = massageSlotsDeviceFilesList[curChannelMinorNum].first;
-    massageSlotsDeviceFilesList[curChannelMinorNum].first = channelPointer;
-    channelPointer->next = tmp;
-    return SUCCESS;
+    channelPointer->minorNumber = ioctl_param;
+    channelPointer->mesLen = 0;
+    channelPointer->next = NULL;
+  }
+  tmp = massageSlotsDeviceFilesList[curChannelMinorNum].first;
+  massageSlotsDeviceFilesList[curChannelMinorNum].first = channelPointer;
+  channelPointer->next = tmp;
+  return SUCCESS;
 }
 
 //---------------------------------------------------------------
