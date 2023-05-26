@@ -30,6 +30,7 @@ static int device_open( struct inode* inode,
 //----------------------------------------------------------------
 static long device_ioctl( struct file* file, unsigned int ioctl_command_id, unsigned long ioctl_param ){
   int curChannelMinorNum;
+  channel *channelPointer;
   channel *tmp;
   //If the passed command is not MSG_SLOT_CHANNEL, the ioctl() returns -1 and errno is set to EINVAL.
   if(ioctl_command_id != MSG_SLOT_CHANNEL){
@@ -40,7 +41,7 @@ static long device_ioctl( struct file* file, unsigned int ioctl_command_id, unsi
     return -EINVAL;
   }
   curChannelMinorNum = iminor(file->f_inode);
-  channel *channelPointer = massageSlotsDeviceFilesList[curChannelMinorNum].first;
+  channelPointer = massageSlotsDeviceFilesList[curChannelMinorNum].first;
   int i = 0;
   while (i == 0){
     if (channelPointer == NULL){
@@ -108,7 +109,8 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 // the device file attempts to read from it
 static ssize_t device_read( struct file* file, char __user* buffer, size_t length, loff_t* offset)
 {
-  channel *currentChannel = (channel *)file->private_data;
+  channel *currentChannel;
+  currentChannel = (channel *)file->private_data;
   //If no channel has been set on the file descriptor
   if(currentChannel == NULL){
     return -EINVAL;
@@ -150,20 +152,15 @@ struct file_operations Fops = {
 static int __init simple_init(void)
 {
   int rc = -1;
-  // init dev struct
-  memset( &device_info, 0, sizeof(struct chardev_info) );
-  spin_lock_init( &device_info.lock );
-
+  int i;
   // Register driver capabilities. Obtain major num
-  rc = register_chrdev( MAJOR_NUM, DEVICE_RANGE_NAME, &Fops );
+  rc = register_chrdev(MAJOR_NUM, DEVICE_RANGE_NAME, &Fops);
 
   // Negative values signify an error
   if( rc < 0 ) {
-    printk( KERN_ALERT "%s registraion failed for  %d\n",
-                       DEVICE_FILE_NAME, MAJOR_NUM );
-    return rc;
+    printk( KERN_ALERT "registraion failed");
+    return -1;
   }
-  int i;
   for(i=0; i<=256; i++){
     massageSlotsDeviceFilesList[i].first = NULL;
   }
