@@ -79,6 +79,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 {
   channel *currentChannel = (channel *)file->private_data;
   char mid_message[BUF_LEN];
+  ssize_t i, j;
   //If no channel has been set on the file descriptor
   if(currentChannel == NULL){
     return -EINVAL;
@@ -90,7 +91,6 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
   if(buffer == NULL){
     return -EINVAL;
   }
-  ssize_t i, j;
   printk("Invoking device_write(%p,%ld)\n", file, length);
   for( i = 0; i < length && i < BUF_LEN; ++i ) {
     if(get_user(mid_message[i], &buffer[i]) != 0) {
@@ -110,6 +110,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 // the device file attempts to read from it
 static ssize_t device_read( struct file* file, char __user* buffer, size_t length, loff_t* offset)
 {
+  int i;
   channel *currentChannel;
   currentChannel = (channel *)file->private_data;
   //If no channel has been set on the file descriptor
@@ -127,7 +128,6 @@ static ssize_t device_read( struct file* file, char __user* buffer, size_t lengt
   if(buffer == NULL){
     return -EINVAL;
   }
-  int i;
   for(i = 0; i < currentChannel->mesLen; i++){
     if (put_user(currentChannel->messageString[i], &buffer[i]) != 0){
       return -EINVAL;
