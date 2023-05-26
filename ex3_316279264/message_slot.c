@@ -38,7 +38,8 @@ static long device_ioctl( struct file* file, unsigned int ioctl_command_id, unsi
       return -EINVAL;
     }
 
-    int curChannelMinorNum = iminor(file->f_inode);
+    int curChannelMinorNum;
+    curChannelMinorNum = iminor(file->f_inode);
     channel *channelPointer = massageSlotsDeviceFilesList[curChannelMinorNum].first;
     int i = 0;
     while (i == 0){
@@ -65,7 +66,8 @@ static long device_ioctl( struct file* file, unsigned int ioctl_command_id, unsi
       channelPointer->mesLen = 0;
       channelPointer->next = NULL;
     }
-    channel *channelPointer tmp = massageSlotsDeviceFilesList[curChannelMinorNum].first;
+    channel *tmp;
+    tmp = massageSlotsDeviceFilesList[curChannelMinorNum].first;
     massageSlotsDeviceFilesList[curChannelMinorNum].first = channelPointer;
     channelPointer->next = tmp;
     return SUCCESS;
